@@ -6,9 +6,9 @@ const upload = multer();
 const fs = require("fs");
 const app = express();
 
-process.env.PORT = process.env.PORT ?? 3000;
-
 const dbKey = process.env.DB_KEY;
+const maxLength = process.env.MAX_NAME_LENGTH ?? 256;
+const PORT = process.env.PORT ?? 3000;
 
 // for parsing application/json
 app.use(bodyParser.json()); 
@@ -30,6 +30,18 @@ app.get('/playlist/*', (req, res) => {
     return;
   }
   var contents = fs.readFileSync(__dirname + '/html/playlist.html', {encoding: 'utf-8'}).replace(/{playlistName}/g, name);
+
+  res.send(contents);
+});
+app.get('/request/*', (req, res) => {
+  var name = req.path.substring(10);
+
+  if (!validateName(name)) {
+    res.status(400);
+    res.redirect("/?error=invalidName");
+    return;
+  }
+  var contents = fs.readFileSync(__dirname + '/html/request.html', {encoding: 'utf-8'}).replace(/{playlistName}/g, name);
 
   res.send(contents);
 });
@@ -74,15 +86,15 @@ app.post("/createPlaylist", (req, res) => {
   res.redirect("/playlist/" + name);
 });
 
-app.listen(process.env.PORT, () => {
-  console.log('Started on port ' + process.env.PORT);
+app.listen(port, () => {
+  console.log('Started on port ' + port);
 });
 
 var allowedChars = process.env.ALLOWED_NAME_CHARS ?? "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 
 function validateName(name) {
   // return true if the name is between 1 and 256 alphanumeric or space characters
-  if (name.length < 1 || name.length > process.env.MAX_NAME_LENGTH) {
+  if (name.length < 1 || name.length > maxLength) {
     return false;
   }
 
@@ -94,3 +106,5 @@ function validateName(name) {
   }
   return true;
 }
+
+module.exports = app;

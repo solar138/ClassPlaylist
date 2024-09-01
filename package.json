@@ -1,16 +1,17 @@
 {
-  "name": "ClassPlaylist",
+  "name": "classplaylist",
   "version": "1.0.0",
   "description": "Simple class playlist system.",
   "main": "index.js",
   "dependencies": {
     "dotenv": "^16.4.5",
+    "expres": "0.0.5",
     "express": "^4.19.2",
     "multer": "^1.4.5-lts.1",
+    "node": "^22.7.0",
     "stream": "0.0.3",
     "web": "0.0.2"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,5 +25,6 @@
   "bugs": {
     "url": "https://github.com/solar138/ClassPlaylist/issues"
   },
-  "homepage": "https://github.com/solar138/ClassPlaylist#readme"
+  "homepage": "https://github.com/solar138/ClassPlaylist#readme",
+  "devDependencies": {}
 }
