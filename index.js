@@ -86,8 +86,8 @@ app.post("/createPlaylist", (req, res) => {
   res.redirect("/playlist/" + name);
 });
 
-app.listen(port, () => {
-  console.log('Started on port ' + port);
+app.listen(PORT, () => {
+  console.log('Started on port ' + PORT);
 });
 
 var allowedChars = process.env.ALLOWED_NAME_CHARS ?? "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
