@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title id="title">{playlistName}</title>
+        <link rel="stylesheet" href="/style.css">
+        <link rel="stylesheet" href="https://use.typekit.net/pqh3gsc.css">
+        <script>playlistName=`{playlistName}`</script>
+    </head>
+    <body>
+        <h1 id="heading">Playlist: {playlistName}</h1>
+        <p id="error"></p>
+        <div id="content">
+            <div id="player"></div>
+        </div>
+        <div id="requests">
+            
+        </div>
+        <input type="checkbox" value="0" id="shuffle">
+        <label for="shuffle">Shuffle</label>
+        <br/>
+        <br/>
+        <input type="checkbox" value="0" id="acceptall">
+        <label for="acceptall">Accept All Requests</label>
+        <br/>
+        <br/>
+        <input type="number" value="16" id="maxlength" placeholder="Max Length">
+        <br/>
+        <label for="acceptall">Keep the newest max length songs.</label>
+        <br/>
+        <br/>
+        <input type="button" value="Skip" onclick="nextVideo()">
+        <input type="button" value="Return" onclick="location.href='/'">
+        <script src="/script.js"></script>
+    </body>
+</html>
