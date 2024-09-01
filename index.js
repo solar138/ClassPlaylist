@@ -42,7 +42,7 @@ app.get('/playlistData/*', (req, res) => {
     return;
   }
   
-  res.send({error: "", name: name, songs: ["dQw4w9WgXcQ", "i8Iy7F1rQic", "a9f8px9aDTM", "WoSlRf1NtGw", "un_1AnGsm-I"], requests: []});
+  res.send({error: "", name: name, songs: [], requests: []});
 });
 
 app.post("/updatePlaylist/*", (req, res) => {
