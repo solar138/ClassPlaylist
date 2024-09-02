@@ -15,6 +15,7 @@ const PORT = process.env.PORT ?? 3000;
 const videoTitles = {};
 const playlists = {};
 const playlistNames = [];
+var ready = false;
 dbRead("playlists").then(names => {
 
   console.log(names);
@@ -32,6 +33,7 @@ dbRead("playlists").then(names => {
     });
     playlistNames.push(names[i]);
   }
+  ready = true;
 });
 
 app.use(bodyParser.json());
@@ -53,6 +55,7 @@ app.get('/playlist/*', (req, res) => {
   res.send(contents);
 });
 app.get('/playlistReadonly/*', (req, res) => {
+  while (!ready) {}
   var name = decodeURIComponent(req.path.substring(18));
 
   if (!validateName(name)) {
@@ -107,21 +110,23 @@ app.get('/requestQR/*', (req, res) => {
   });
 });
 app.get('/playlistData/*', (req, res) => {
-  var name = decodeURIComponent(req.path.substring(14));
+  waitUntilReady(() => {
+    var name = decodeURIComponent(req.path.substring(14));
 
-  if (!validateName(name)) {
-    res.status(400);
-    res.send({error: "INVALID_NAME", name: name, songs: [], requests: []});
-    return;
-  }
+    if (!validateName(name)) {
+      res.status(400);
+      res.send({error: "INVALID_NAME", name: name, songs: [], requests: []});
+      return;
+    }
 
-  if (playlists[name] == undefined) {
-    res.status(404);
-    res.send({error: "NOT_FOUND", name: name, songs: [], requests: []});
-    return;
-  }
-  
-  res.send({error: "", name: name, songs: playlists[name].songs, requests: playlists[name].requests});
+    if (playlists[name] == undefined) {
+      res.status(404);
+      res.send({error: "NOT_FOUND", name: name, songs: [], requests: []});
+      return;
+    }
+    
+    res.send({error: "", name: name, songs: playlists[name].songs, requests: playlists[name].requests});
+  });
 });
 app.get("/clearName", (req, res) => {
   res.send(__dirname + '/html/clearName.html');
@@ -339,6 +344,16 @@ async function dbRead(key) {
     Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
   },
   })).json()).result);
+}
+
+function waitUntilReady(callback) {
+  if (ready) {
+    callback();
+  } else {
+    setTimeout(() => {
+      waitUntilReady(callback);
+    }, 100);
+  }
 }
 
 module.exports = app;
