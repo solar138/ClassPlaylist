@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title id="title">{playlistName}</title>
+        <link rel="stylesheet" href="/style.css">
+        <link rel="stylesheet" href="https://use.typekit.net/pqh3gsc.css">
+        <script>playlistName=`{playlistName}`</script>
+    </head>
+    <body>
+        <h1 id="heading">Adding To {playlistName}</h1>
+
+        <form method="POST">
+            <table style="margin:auto; text-align: right;">
+                <tr>
+                    <td><label>Your Name</label></td>
+                    <td> </td>
+                    <td style="text-align:left"><input type="text" id="userName" name="userName" placeholder="Your Name"><label id="nameLabel"></label></td>
+                </tr>
+                <tr>
+                    <td><label>YouTube URL</label></td>
+                    <td> </td>
+                    <td><input type="text" id="songURL" name="songURL" placeholder="YouTube URL"></td>
+                </tr>
+                <tr>
+                    <td><label>Song Name</label></td>
+                    <td> </td>
+                    <td><input type="text" id="songName" name="songName" placeholder="Song Name"></td>
+                </tr>
+            </table>
+            <br/>
+            <input type="submit" id="submit" value="Submit">
+        </form>
+    </br>
+        <input type="button" id="view" value="View" onclick="location.path = '/playlist/' + playlistName">
+
+        <script src="/script.js"></script>
+    </body>
+</html>
