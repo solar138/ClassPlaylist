@@ -43,47 +43,52 @@ app.use(express.static('public'));
 app.use(cookieParser());
 
 app.get('/playlist/*', (req, res) => {
-  var name = decodeURIComponent(req.path.substring(10));
+  waitUntilReady(() => {
+    var name = decodeURIComponent(req.path.substring(10));
 
-  if (!validateName(name)) {
-    res.status(400);
-    res.redirect("/?error=invalidName");
-    return;
-  }
-  var contents = fs.readFileSync(__dirname + '/html/playlist.html', {encoding: 'utf-8'}).replace(/{playlistName}/g, name);
+    if (!validateName(name)) {
+      res.status(400);
+      res.redirect("/?error=invalidName");
+      return;
+    }
+    var contents = fs.readFileSync(__dirname + '/html/playlist.html', {encoding: 'utf-8'}).replace(/{playlistName}/g, name);
 
-  res.send(contents);
+    res.send(contents);
+  });
 });
 app.get('/playlistReadonly/*', (req, res) => {
-  while (!ready) {}
-  var name = decodeURIComponent(req.path.substring(18));
+  waitUntilReady(() => {
+    var name = decodeURIComponent(req.path.substring(18));
 
-  if (!validateName(name)) {
-    res.status(400);
-    res.redirect("/?error=invalidName");
-    return;
-  }
-  var contents = fs.readFileSync(__dirname + '/html/playlistReadonly.html', {encoding: 'utf-8'}).replace(/{playlistName}/g, name);
+    if (!validateName(name)) {
+      res.status(400);
+      res.redirect("/?error=invalidName");
+      return;
+    }
+    var contents = fs.readFileSync(__dirname + '/html/playlistReadonly.html', {encoding: 'utf-8'}).replace(/{playlistName}/g, name);
 
-  res.send(contents);
+    res.send(contents);
+  });
 });
 app.get('/request/*', (req, res) => {
-  var name = decodeURIComponent(req.path.substring(9));
+  waitUntilReady(() => {
+    var name = decodeURIComponent(req.path.substring(9));
 
-  if (!validateName(name)) {
-    res.status(400);
-    res.redirect("/?error=invalidName");
-    return;
-  }
+    if (!validateName(name)) {
+      res.status(400);
+      res.redirect("/?error=invalidName");
+      return;
+    }
 
-  if (playlists[name] == undefined) {
-    res.status(404);
-    res.redirect("/?error=playlistNotFound");
-    return;
-  }
-  var contents = fs.readFileSync(__dirname + '/html/request.html', {encoding: 'utf-8'}).replace(/{playlistName}/g, name);
+    if (playlists[name] == undefined) {
+      res.status(404);
+      res.redirect("/?error=playlistNotFound");
+      return;
+    }
+    var contents = fs.readFileSync(__dirname + '/html/request.html', {encoding: 'utf-8'}).replace(/{playlistName}/g, name);
 
-  res.send(contents);
+    res.send(contents);
+  });
 });
 app.get('/requestQR/*', (req, res) => {
   var name = decodeURIComponent(req.path.substring(11));
