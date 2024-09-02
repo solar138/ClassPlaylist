@@ -86,7 +86,7 @@ app.get('/requestQR/*', (req, res) => {
   }
   
   var contents = fs.readFileSync(__dirname + '/html/requestQR.html', {encoding: 'utf-8'}).replace(/{playlistName}/g, name);
-  var url = "https://" + req.headers.host + req.path;
+  var url = "https://" + req.headers.host + "/request/" + encodeURIComponent(name);
   qrcode.toDataURL(url, {scale: 20}, (err, qr) => {
     contents = contents.replace("{qrcode}", qr);
     contents = contents.replace("{qrcodeURL}", url);

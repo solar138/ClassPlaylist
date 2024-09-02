@@ -26,3 +26,12 @@ button {
 a {
     color: #7f7fff;
 }
+@media print {
+    @page { margin: 0; }
+    body { margin: 1.6cm; overflow: none; color: #000000 }
+    p {
+        color: #000000;
+    }
+    #print-button { opacity: 0%;}
+    #qrcode { position: absolute; left: 50%; transform: translateX(-50%); height: 1000px; }
+  }
