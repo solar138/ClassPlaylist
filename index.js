@@ -163,8 +163,6 @@ app.post("/videoTitle", (req, res) => {
   var titles = {};
   var promises = [];
 
-  console.log(ids);
-
   for (var i = 0; i < ids.length; i++) {
     var id = ids[i];
     if (videoTitles[id] != undefined) {
@@ -183,7 +181,6 @@ app.post("/videoTitle", (req, res) => {
             videoTitles[id] = title;
             titles[id] = title;
           } catch {
-            console.log(x);
             videoTitles[id] = "Untitled (API Error)";
             titles[id] = "Untitled (API Error)";
           }
@@ -249,7 +246,12 @@ app.post("/createPlaylist", async (req, res) => {
     await dbWrite("playlists", playlistNames);
   }
 
-  res.cookie("password", password);
+  res.cookie("password", password, {
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    sameSite: "strict",
+    maxAge: 1000 * 60 * 60 * 24 * 30,
+  });
   
   res.redirect("/playlist/" + name);
 });

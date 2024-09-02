@@ -13,34 +13,56 @@ if (location.search.includes("error=playlistNotFound")) {
 }
 var readonly =  location.pathname.startsWith("/playlistReadonly/");
 
-if (location.pathname.startsWith("/playlist/") || readonly) {
-    name = readonly ? location.pathname.substring(18) : location.pathname.substring(10);
-    document.getElementById("title").innerText = name;
+async function fetchData() {
+  try {
+    var data = await fetch("/playlistData/" + name)
+    data = await data.json();
 
-    async function fetchData() {
-        var data = await fetch("/playlistData/" + name)
-        data = await data.json();
-
-        if (data.error == "NOT_FOUND") {
-            location.href = "/?error=playlistNotFound";
-        }
-        return data;
+    if (data.error == "NOT_FOUND") {
+        location.href = "/?error=playlistNotFound";
     }
+    errorText.innerHTML = "";
+    return data;
+  } catch (e) {
+    errorText.innerHTML = "Server connection lost.";
+  }
+}
 
-    fetchData().then(x => { 
-        songs = x.songs;
-        requests = x.requests;
-  
+var iframeImported = false;
+
+function updateData() {
+
+  fetchData().then(x => {
+      songs = x.songs;
+      requests = x.requests;
+
+      if (!iframeImported) {
+
         var tag = document.createElement('script');
       
         tag.src = "https://www.youtube.com/iframe_api";
         var firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        drawSongs();
-        
-        drawRequests();
-    });
+        iframeImported = true;
+      } else {
+        if (settings.acceptall == "true") {
+          while (requests.length > 0) {
+            acceptRequest(0);
+          }
+        }
+      }
+
+      drawSongs();
+      
+      drawRequests();
+  });}
+
+if (location.pathname.startsWith("/playlist/") || readonly) {
+    name = readonly ? location.pathname.substring(18) : location.pathname.substring(10);
+    document.getElementById("title").innerText = name;
+
+    updateData();
 }
 if (location.pathname.startsWith("/request/")) {
   trackSetting("userName");
@@ -103,7 +125,15 @@ function onPlayerStateChange(event) {
   }
 }
 
+
+
 function nextVideo() {
+  if (songs.length == 0) {
+    content.innerHTML = "<p style='color: #7f7f7f'>No songs in playlist.</p>";
+    player.stopVideo();
+    document.getElementsByTagName("iframe")[0].style.display = "none";
+    return;
+  }
   if (settings["shuffle"] == "true") {
     nextIndex = Math.floor(Math.random() * songs.length);
   } else {
@@ -130,6 +160,7 @@ function removeVideo(index) {
   }
   updatePlaylist();
   nextVideo();
+  drawSongs();
 }
 
 function trackSetting(id) {
@@ -172,6 +203,19 @@ async function updatePlaylist() {
       requests: requests,
     }),
   });
+
+  if (data.status == 401) {
+
+    var input = prompt("Enter access password: ");
+
+    if (input != undefined) {
+      document.cookie = "password=" + input;
+
+      updatePlaylist();
+    } else {
+      location.href = location.href.replace("/playlist/", "/playlistReadonly/");
+    }
+  }
 }
 
 function acceptRequest(index) {
@@ -202,13 +246,18 @@ function drawRequests() {
     requestsList.innerHTML = "<p style='color: #7f7f7f'>No requests awaiting.</p>";
   } else {
     requestsList.innerHTML = "";
-    for (let i = 0; i < requests.length; i++) {
-      if (readonly) {
-        requestsList.innerHTML += `<p id='request-${i}'>${requests[i].userName} requested <a href="${requests[i].songURL}">${requests[i].songName}</a></p>`;
-      } else {
-        requestsList.innerHTML += `<hr><p id='request-${i}'>${requests[i].userName} requested <a href="${requests[i].songURL}">${requests[i].songName}</a> <button onclick="acceptRequest(${i})">Accept</button> <button onclick="rejectRequest(${i})">Reject</button></p>`;
+
+    var ids = songs.map(x => x.slice(-11));
+
+    getSongName(ids).then(names => {
+      for (let i = 0; i < requests.length; i++) {
+        if (readonly) {
+          requestsList.innerHTML += `<p id='request-${i}'>${requests[i].userName} requested <a href="${requests[i].songURL}">${names[ids[i]]}</a></p>`;
+        } else {
+          requestsList.innerHTML += `<hr><p id='request-${i}'>${requests[i].userName} requested <a href="${requests[i].songURL}">${names[ids[i]]}</a> <button onclick="acceptRequest(${i})">Accept</button> <button onclick="rejectRequest(${i})">Reject</button></p>`;
+        }
       }
-    }
+    });
   }
 }
 
@@ -229,9 +278,14 @@ function drawSongs() {
   }
   var songsList = document.getElementById("songs");
   var html = "<table style='width: 100%; table-layout: fixed'>";
+
   getSongName(songs).then(names => {
     for (let i = 0; i < songs.length; i++) {
-      html += `<tr><td style="text-align: right;"><a href="https://www.youtube.com/watch?v=${songs[i]}" style="color:white;text-decoration:none">${names[songs[i]]} </a></td><td style="text-align: left;"> <button onclick="removeVideo(${i})">Remove</button></td></tr>`;
+      if (readonly) {
+        html += `<tr><td style="text-align: center;">${i + 1}. <a href="https://www.youtube.com/watch?v=${songs[i]}" style="color:white;text-decoration:none">${names[songs[i]]} </a></td></tr>`;
+      } else {
+        html += `<tr><td style="text-align: right;">${i + 1}. <a href="https://www.youtube.com/watch?v=${songs[i]}" style="color:white;text-decoration:none">${names[songs[i]]} </a></td><td style="text-align: left;"> <button onclick="removeVideo(${i})">Remove</button></td></tr>`;
+      }
     }
     html += "</table><hr>";
 
@@ -246,6 +300,11 @@ function addSong() {
     return;
   }
 
+  var iframe = document.getElementsByTagName("iframe")[0];
+  
+  if (iframe != undefined) iframe.style.display = "inline";
+
+  done = false;
   songs.push(url.slice(-11));
   drawSongs();
   updatePlaylist();
@@ -267,3 +326,5 @@ async function getSongName(ids) {
 trackSetting("shuffle");
 trackSetting("acceptall");
 trackSetting("maxlength");
+
+setInterval(updateData, 5000);
