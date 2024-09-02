@@ -7,12 +7,14 @@
         <link rel="stylesheet" href="https://use.typekit.net/pqh3gsc.css">
     </head>
     <body>
-        <h1>Create Playlist</h1>
+        <h1>Create or Access Playlist</h1>
         <p id="error"></p>
         <p>
             <form action="createPlaylist" method="post">
-                <input type="text" id="playlistName" name="playlistName"placeholder="Playlist Name">
-                <input type="submit" id="submit" value="Create" method="post">
+                <input type="text" autocomplete="username" id="playlistName" name="playlistName" placeholder="Playlist Name">
+                <input type="password" autocomplete="current-password" id="password" name="password" placeholder="Access Password">
+                <input type="submit" name="submit" id="submit" value="Submit" method="post">
+                <input type="submit" name="readonly" id="submitReadonly" value="Submit Read-Only" method="post">
             </form>
         </p>
         <script src="script.js"></script>
