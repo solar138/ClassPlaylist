@@ -246,7 +246,7 @@ function addSong() {
 }
 
 async function getSongName(ids) {
-  return await (await fetch("http://localhost:3000/videoTitle", {
+  return await (await fetch("/videoTitle", {
   headers: {
       'Accept': 'application/json', 
       "Content-Type": "application/json"
