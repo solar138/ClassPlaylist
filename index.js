@@ -102,6 +102,12 @@ app.get('/playlistData/*', (req, res) => {
     res.send({error: "INVALID_NAME", name: name, songs: [], requests: []});
     return;
   }
+
+  if (playlists[name] == undefined) {
+    res.status(404);
+    res.send({error: "NOT_FOUND", name: name, songs: [], requests: []});
+    return;
+  }
   
   res.send({error: "", name: name, songs: playlists[name].songs, requests: playlists[name].requests});
 });

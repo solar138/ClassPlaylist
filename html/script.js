@@ -19,6 +19,10 @@ if (location.pathname.startsWith("/playlist/")) {
     async function fetchData() {
         var data = await fetch("/playlistData/" + name)
         data = await data.json();
+
+        if (data.error == "NOT_FOUND") {
+            location.href = "/?error=playlistNotFound";
+        }
         return data;
     }
 
@@ -198,9 +202,8 @@ function drawRequests() {
   } else {
     requestsList.innerHTML = "";
     for (let i = 0; i < requests.length; i++) {
-      requestsList.innerHTML += `<hr><p id='request-${i}'>${requests[i].userName} requested <a href="${requests[i].songURL}">${requests[i].songName}</a><br/><button onclick="acceptRequest(${i})">Accept</button> <button onclick="rejectRequest(${i})">Reject</button></p>`;
+      requestsList.innerHTML += `<hr><p id='request-${i}'>${requests[i].userName} requested <a href="${requests[i].songURL}">${requests[i].songName}</a> <button onclick="acceptRequest(${i})">Accept</button> <button onclick="rejectRequest(${i})">Reject</button></p>`;
     }
-    requestsList.innerHTML += "<hr>";
   }
 }
 
