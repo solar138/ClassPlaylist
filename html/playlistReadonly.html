@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title id="title">{playlistName}</title>
+        <link rel="stylesheet" href="/style.css">
+        <link rel="stylesheet" href="https://use.typekit.net/pqh3gsc.css">
+        <script>playlistName=`{playlistName}`</script>
+    </head>
+    <body>
+        <h1 id="heading">Playlist: {playlistName}</h1>
+        <hr/>
+        <p id="error"></p>
+        <div id="content">
+            Loading...
+        </div>
+        <div id="player"></div>
+        <div id="songs"></div>
+        <div id="requests">
+            
+        </div>
+        <hr/>
+        <input type="checkbox" value="0" id="shuffle">
+        <label for="shuffle">Shuffle</label>
+        <input type="checkbox" value="0" id="acceptall">
+        <label for="acceptall">Accept All Requests</label>
+        <br/>
+        <div style="height: 6px"></div>
+        <label for="acceptall">Max Songs: </label>
+        <input type="number" value="16" id="maxlength" placeholder="Max Songs">
+        <br/>
+        <div id="currentSongInfo">
+            <br/>
+        <input type="button" value="Skip Current Song" onclick="nextVideo()">
+        <!--input type="button" value="Remove" onclick="removeVideo()"-->
+        </div>
+        <hr/>
+
+        <input type="button" value="Return" onclick="location.href='/'">
+        <input type="button" value="Request" onclick="window.open('/request/' + playlistName, '_blank')">
+        <input type="button" value="Open QR Code" onclick="window.open('/requestQR/' + playlistName, '_blank')">
+        <br/>
+        <div style="height: 10px"></div>
+        <input id="forceAddURL" type="text" placeholder="YouTube URL">
+        <input type="button" value="Add Song" onclick="addSong()">
+        <br/>
+        <br/>
+        <p class="help">Instructors, keep this page hidden from the public. Leave it open to play audio.</p>
+        <script src="/script.js"></script>
+    </body>
+</html>
