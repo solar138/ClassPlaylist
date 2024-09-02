@@ -52,6 +52,18 @@ app.get('/playlist/*', (req, res) => {
 
   res.send(contents);
 });
+app.get('/playlistReadonly/*', (req, res) => {
+  var name = decodeURIComponent(req.path.substring(18));
+
+  if (!validateName(name)) {
+    res.status(400);
+    res.redirect("/?error=invalidName");
+    return;
+  }
+  var contents = fs.readFileSync(__dirname + '/html/playlistReadonly.html', {encoding: 'utf-8'}).replace(/{playlistName}/g, name);
+
+  res.send(contents);
+});
 app.get('/request/*', (req, res) => {
   var name = decodeURIComponent(req.path.substring(9));
 

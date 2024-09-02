@@ -11,9 +11,10 @@ if (location.search.includes("error=wrongUserOrPassword")) {
 if (location.search.includes("error=playlistNotFound")) {
     errorText.innerText = "Playlist does not exist.";
 }
+var readonly =  location.pathname.startsWith("/playlistReadonly/");
 
-if (location.pathname.startsWith("/playlist/")) {
-    name = location.pathname.substring(10);
+if (location.pathname.startsWith("/playlist/") || readonly) {
+    name = readonly ? location.pathname.substring(18) : location.pathname.substring(10);
     document.getElementById("title").innerText = name;
 
     async function fetchData() {
@@ -202,7 +203,11 @@ function drawRequests() {
   } else {
     requestsList.innerHTML = "";
     for (let i = 0; i < requests.length; i++) {
-      requestsList.innerHTML += `<hr><p id='request-${i}'>${requests[i].userName} requested <a href="${requests[i].songURL}">${requests[i].songName}</a> <button onclick="acceptRequest(${i})">Accept</button> <button onclick="rejectRequest(${i})">Reject</button></p>`;
+      if (readonly) {
+        requestsList.innerHTML += `<p id='request-${i}'>${requests[i].userName} requested <a href="${requests[i].songURL}">${requests[i].songName}</a></p>`;
+      } else {
+        requestsList.innerHTML += `<hr><p id='request-${i}'>${requests[i].userName} requested <a href="${requests[i].songURL}">${requests[i].songName}</a> <button onclick="acceptRequest(${i})">Accept</button> <button onclick="rejectRequest(${i})">Reject</button></p>`;
+      }
     }
   }
 }

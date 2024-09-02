@@ -16,20 +16,12 @@
         </div>
         <div id="player"></div>
         <div id="songs"></div>
-        <h2 id="heading">Song Requests:</h1>
         <div id="requests">
             
         </div>
         <hr/>
         <input type="checkbox" value="0" id="shuffle">
         <label for="shuffle">Shuffle</label>
-        <input type="checkbox" value="0" id="acceptall">
-        <label for="acceptall">Accept All Requests</label>
-        <br/>
-        <div style="height: 6px"></div>
-        <label for="acceptall">Max Songs: </label>
-        <input type="number" value="16" id="maxlength" placeholder="Max Songs">
-        <br/>
         <div id="currentSongInfo">
             <br/>
         <input type="button" value="Skip Current Song" onclick="nextVideo()">
@@ -41,12 +33,8 @@
         <input type="button" value="Request" onclick="window.open('/request/' + playlistName, '_blank')">
         <input type="button" value="Open QR Code" onclick="window.open('/requestQR/' + playlistName, '_blank')">
         <br/>
-        <div style="height: 10px"></div>
-        <input id="forceAddURL" type="text" placeholder="YouTube URL">
-        <input type="button" value="Add Song" onclick="addSong()">
         <br/>
-        <br/>
-        <p class="help">Keep this page hidden but leave the tab open to play audio. Press "Open QR Code" to show or print the QR code for the playlist. If there are any requests, they should show </p>
+        <p class="help">Keep this page hidden but leave the tab open to play audio. Press "Open QR Code" to show or print the QR code for the playlist. Read-only version.</p>
         <script src="/script.js"></script>
     </body>
 </html>
