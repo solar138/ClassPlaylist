@@ -108,53 +108,6 @@ app.get('/playlistData/*', (req, res) => {
 app.get("/clearName", (req, res) => {
   res.send(__dirname + '/html/clearName.html');
 });
-app.post("/videoTitle", (req, res) => {
-  var ids = req.body.ids;
-
-  console.log(req.body);
-  console.log(videoTitles);
-
-  if (Array.isArray(ids) == false) {
-    ids = [ids];
-  }
-
-  var titles = {};
-  var promises = [];
-
-  for (var i = 0; i < ids.length; i++) {
-    var id = ids[i];
-    console.log(id);
-    if (videoTitles[id] != undefined) {
-      titles[id] = videoTitles[id];
-    } else {
-      var promise = fetch("https://www.googleapis.com/youtube/v3/videos?key=AIzaSyBp8HnebL9IzdnEPmmfvkkt9vIhFmKc4bU&id=" + id + "&part=localizations").then(x => x.json());
-
-      
-      var j = i;
-      promises.push(
-      promise.then(x => {
-        try {
-          var id = x.items[0].id;
-          try {
-            var title = x.items[0].localizations.en.title;
-            console.log(title, id);
-            videoTitles[id] = title;
-            titles[id] = title;
-          } catch {
-            videoTitles[id] = "Untitled (API Error)";
-            titles[id] = "Untitled (API Error)";
-          }
-        } catch {
-          videoTitles[id] = "Video Not Found (API Error)";
-          titles[id] = "Video Not Found (API Error)";
-        }
-      }));
-    }
-  }
-  Promise.all(promises).then(x => {
-    res.send(titles);
-  });
-});
 app.get("/videoTitle/*", (req, res) => {
   var name = decodeURIComponent(req.path.substring(12));
   
@@ -162,8 +115,6 @@ app.get("/videoTitle/*", (req, res) => {
     res.send(videoTitles[name]);
     return;
   }
-
-  console.log(name);
 
   fetch("https://www.googleapis.com/youtube/v3/videos?key=AIzaSyBp8HnebL9IzdnEPmmfvkkt9vIhFmKc4bU&id=" + name + "&part=localizations").then(x => x.json()).then(x => {
     try {
@@ -179,15 +130,58 @@ app.get("/videoTitle/*", (req, res) => {
 app.get('*', (req, res) => {
   res.sendFile(__dirname + '/html/' + req.path);
 });
+app.post("/videoTitle", (req, res) => {
+  var ids = req.body.ids;
+
+  if (Array.isArray(ids) == false) {
+    ids = [ids];
+  }
+
+  var titles = {};
+  var promises = [];
+
+  console.log(ids);
+
+  for (var i = 0; i < ids.length; i++) {
+    var id = ids[i];
+    if (videoTitles[id] != undefined) {
+      titles[id] = videoTitles[id];
+    } else {
+      var promise = fetch("https://www.googleapis.com/youtube/v3/videos?key=AIzaSyBp8HnebL9IzdnEPmmfvkkt9vIhFmKc4bU&id=" + id + "&part=localizations").then(x => x.json());
+
+      
+      var j = i;
+      promises.push(
+      promise.then(x => {
+        try {
+          var id = x.items[0].id;
+          try {
+            var title = x.items[0].localizations.en.title;
+            videoTitles[id] = title;
+            titles[id] = title;
+          } catch {
+            console.log(x);
+            videoTitles[id] = "Untitled (API Error)";
+            titles[id] = "Untitled (API Error)";
+          }
+        } catch {
+          videoTitles[id] = "Video Not Found (API Error)";
+          titles[id] = "Video Not Found (API Error)";
+        }
+      }));
+    }
+  }
+  Promise.all(promises).then(x => {
+    res.send(titles);
+  });
+});
 app.post("/updatePlaylist/*", (req, res) => {
   var name = decodeURIComponent(req.path.substring(16));
-  console.log(name);
   if (!validateName(name)) {
     res.status(400);
     res.send("INVALID_NAME");
     return;
   }
-  console.log(req.cookies);
   if ((req.cookies == undefined ? "" : req.cookies.password) != playlists[name].password) {
     res.status(401);
     res.send("NO_AUTHENTICATION");
@@ -216,9 +210,6 @@ app.post("/createPlaylist", async (req, res) => {
     res.redirect("/?error=invalidName");
     return;
   }
-
-  console.log(playlists);
-
   if (req.body.readonly == undefined && playlists[name] && playlists[name].password != password) {
     res.redirect("/?error=wrongUserOrPassword");
     return;
@@ -270,6 +261,22 @@ app.post("/request/*", (req, res) => {
 
   console.log(userName + " added song " + songName + " to playlist " + name);
   
+  res.redirect("/playlist/" + name);
+});
+app.post("/changePassword.html", (req, res) => {
+  var name = req.body.playlistName;
+  var oldPassword = req.body.oldPassword;
+  var newPassword = req.body.newPassword;
+  if (!validateName(name)) {
+    res.redirect("/changePassword.html?error=invalidName");
+    return;
+  }
+  if (playlists[name] == undefined || playlists[name].password == oldPassword) {
+    res.redirect("/changePassword.html?error=wrongUserOrPassword");
+    return;
+  }
+  playlists[name].password = newPassword;
+  dbWrite("playlist-" + name, playlists[name]);
   res.redirect("/playlist/" + name);
 });
 
