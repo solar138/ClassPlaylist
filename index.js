@@ -382,7 +382,7 @@ function waitUntilReady(callback) {
     callback();
   } else {
     setTimeout(async () => {
-      await waitUntilReady(callback);
+      waitUntilReady(callback);
     }, 100);
   }
 }
