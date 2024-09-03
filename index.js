@@ -250,37 +250,39 @@ app.post("/updatePlaylist/*", (req, res) => {
   res.send("OK");
 });
 app.post("/createPlaylist", async (req, res) => {
-  var name = req.body.playlistName;
-  var password = req.body.password;
+  waitUntilReady(() => {
+    var name = req.body.playlistName;
+    var password = req.body.password;
 
-  if (!validateName(name)) {
-    res.redirect("/?error=invalidName");
-    return;
-  }
-  if (req.body.readonly == undefined && playlists[name] && playlists[name].password != password) {
-    res.redirect("/?error=wrongUserOrPassword");
-    return;
-  }
+    if (!validateName(name)) {
+      res.redirect("/?error=invalidName");
+      return;
+    }
+    if (req.body.readonly == undefined && playlists[name] && playlists[name].password != password) {
+      res.redirect("/?error=wrongUserOrPassword");
+      return;
+    }
 
-  if (!playlists[name]) {
-    console.log("Created playlist " + name + " with password " + password);
+    if (!playlists[name]) {
+      console.log("Created playlist " + name + " with password " + password);
 
-    var playlist = {name: name, password: password, songs: [], requests: []};
-    playlistNames.push(name);
-    playlists[name] = playlist;
-  
-    await dbWrite("playlist-" + name, playlist);
-    await dbWrite("playlists", playlistNames);
-  }
+      var playlist = {name: name, password: password, songs: [], requests: []};
+      playlistNames.push(name);
+      playlists[name] = playlist;
+    
+      await dbWrite("playlist-" + name, playlist);
+      await dbWrite("playlists", playlistNames);
+    }
 
-  res.cookie("password", password, {
-    secure: process.env.NODE_ENV === "production",
-    httpOnly: true,
-    sameSite: "strict",
-    maxAge: 1000 * 60 * 60 * 24 * 30,
+    res.cookie("password", password, {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60 * 24 * 30,
+    });
+    
+    res.redirect("/playlist/" + name);
   });
-  
-  res.redirect("/playlist/" + name);
 });
 app.post("/request/*", (req, res) => {
   var name = decodeURIComponent(req.path.substring(9));
