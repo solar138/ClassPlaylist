@@ -16,9 +16,8 @@ const videoTitles = {};
 const playlists = {};
 const playlistNames = [];
 var ready = false;
+var playlistsRemaining = 0;
 dbRead("playlists").then(names => {
-
-  console.log(names);
 
   if (Array.isArray(names) == false) {
     dbWrite("playlists", []);
@@ -33,23 +32,31 @@ dbRead("playlists").then(names => {
 
   var promises = [];
 
+  playlistsRemaining = names.length;
+
   for (var i = 0; i < names.length; i++) {
-    var j = i;
     var promise = dbRead("playlist-" + names[i]);
     promises.push(promise);
-    
+    var j = i;
     promise.then(data => {
-      playlists[names[j]] = data; 
-      console.log("Playlist " + names[j] + " has " + playlists[names[j]].songs.length + " songs and " + playlists[names[j]].requests.length + " requests");
+      playlists[data.name] = data; 
+      console.log("Playlist " + data.name + " has " + playlists[names[j]].songs.length + " songs and " + playlists[names[j]].requests.length + " requests");
+      playlistsRemaining --;
     });
     playlistNames.push(names[i]);
   }
 
-  Promise.all(promises, () => {
+  checkIfReady();
+});
+
+function checkIfReady() {
+  if (playlistsRemaining == 0) {
     console.log("All playlists loaded");
     ready = true;
-  });
-});
+  } else {
+    setTimeout(checkIfReady, 100);
+  }
+}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
