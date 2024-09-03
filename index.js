@@ -250,7 +250,7 @@ app.post("/updatePlaylist/*", (req, res) => {
   res.send("OK");
 });
 app.post("/createPlaylist", async (req, res) => {
-  waitUntilReady(() => {
+  waitUntilReady(async () => {
     var name = req.body.playlistName;
     var password = req.body.password;
 
@@ -381,8 +381,8 @@ function waitUntilReady(callback) {
   if (ready) {
     callback();
   } else {
-    setTimeout(() => {
-      waitUntilReady(callback);
+    setTimeout(async () => {
+      await waitUntilReady(callback);
     }, 100);
   }
 }
