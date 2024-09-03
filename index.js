@@ -35,10 +35,13 @@ dbRead("playlists").then(names => {
 
   for (var i = 0; i < names.length; i++) {
     var j = i;
-    promises.push(dbRead("playlist-" + names[i]).then(data => {
+    var promise = dbRead("playlist-" + names[i]);
+    promises.push(promise);
+    
+    promise.then(data => {
       playlists[names[j]] = data; 
       console.log("Playlist " + names[j] + " has " + playlists[names[j]].songs.length + " songs and " + playlists[names[j]].requests.length + " requests");
-    }));
+    });
     playlistNames.push(names[i]);
   }
 
