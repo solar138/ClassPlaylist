@@ -59,10 +59,12 @@ function updateData() {
   });}
 
 if (location.pathname.startsWith("/playlist/") || readonly) {
-    name = readonly ? location.pathname.substring(18) : location.pathname.substring(10);
-    document.getElementById("title").innerText = name;
+  setInterval(updateData, 5000);
+  
+  name = readonly ? location.pathname.substring(18) : location.pathname.substring(10);
+  document.getElementById("title").innerText = name;
 
-    updateData();
+  updateData();
 }
 if (location.pathname.startsWith("/request/")) {
   trackSetting("userName");
@@ -326,5 +328,3 @@ async function getSongName(ids) {
 trackSetting("shuffle");
 trackSetting("acceptall");
 trackSetting("maxlength");
-
-setInterval(updateData, 5000);

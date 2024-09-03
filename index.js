@@ -23,17 +23,29 @@ dbRead("playlists").then(names => {
   if (Array.isArray(names) == false) {
     dbWrite("playlists", []);
   }
+
+  names = [...new Set(names)];
+
+  dbWrite("playlists", names);
   
   console.log("Loaded " + names.length + " playlists");
+
+
+  var promises = [];
+
   for (var i = 0; i < names.length; i++) {
     var j = i;
-    dbRead("playlist-" + names[i]).then(data => {
+    promises.push(dbRead("playlist-" + names[i]).then(data => {
       playlists[names[j]] = data; 
       console.log("Playlist " + names[j] + " has " + playlists[names[j]].songs.length + " songs and " + playlists[names[j]].requests.length + " requests");
-    });
+    }));
     playlistNames.push(names[i]);
   }
-  ready = true;
+
+  Promise.all(promises, () => {
+    console.log("All playlists loaded");
+    ready = true;
+  });
 });
 
 app.use(bodyParser.json());
